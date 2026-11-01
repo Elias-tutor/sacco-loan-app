@@ -1,0 +1,136 @@
+# Let's create the templates directory and create world_bank_index.html and profit_report.html so everything is fully functional and complete.
+os.makedirs('templates', exist_ok=True)
+
+index_html_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nyakadote SACCO - World Bank Loan Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-11">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">NYAKADOTE MARKET VENDORS SAVINGS AND CREDIT SOCIETY</h4>
+                            <small>REG. NO: 11880/RCS | Bweyale Town Council, Kiryandongo District</small>
+                        </div>
+                        <div>
+                            <a href="/profit_report" class="btn btn-warning btn-sm fw-bold me-2">View 2-Year General Profit & Graphs Report</a>
+                            <a href="/download_loans_given_report" class="btn btn-light btn-sm fw-bold text-primary">DOWNLOAD LOANS GIVEN OUT REPORT</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="text-secondary mb-3">Member Loan Application Form</h5>
+                        <form action="/add_wb_member" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Member Names</label>
+                                    <input type="text" class="form-control" name="member_name" required placeholder="Full Name">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Sex</label>
+                                    <select class="form-select" name="sex">
+                                        <option value="Female">Female</option>
+                                        <option value="Male">Male</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label">Tel Contacts</label>
+                                    <input type="text" class="form-control" name="contact" required placeholder="Phone Number">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Place (Address)</label>
+                                    <input type="text" class="form-control" name="place" required placeholder="Village / Zone">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Business Type</label>
+                                    <input type="text" class="form-control" name="business_type" required placeholder="e.g. MARKET VENDINGS - Cassava">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Member Photo</label>
+                                    <input type="file" class="form-control" name="photo">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Loan Date</label>
+                                    <input type="date" class="form-control" name="loan_date" required value="2025-07-01">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Loan Amount Requested (UGX)</label>
+                                    <input type="number" step="0.01" class="form-control" name="principal" required placeholder="e.g. 1000000">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Submit Application & Generate Weekly Schedule</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="text-primary mb-0">Approved Loan Applicants Queue ({{ members|length }})</h5>
+                            {% if members %}
+                            <form action="/clear_wb_members" method="POST" class="mb-0">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Clear Queue</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        
+                        {% if members %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped text-center align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Photo</th>
+                                        <th>Name</th>
+                                        <th>Loan ID</th>
+                                        <th>Contact</th>
+                                        <th>Business</th>
+                                        <th>Principal</th>
+                                        <th>5% Deposit</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in members %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ url_for('static', filename='uploads/' + m.photo) }}" alt="Photo" width="40" height="40" class="rounded-circle object-fit-cover">
+                                        </td>
+                                        <td class="fw-bold">{{ m.member_name }}</td>
+                                        <td>{{ m.loan_id }}</td>
+                                        <td>{{ m.contact }}</td>
+                                        <td>{{ m.business_type }}</td>
+                                        <td>UGX {{ "{:,.2f}".format(m.principal) }}</td>
+                                        <td>UGX {{ "{:,.2f}".format(m.initial_deposit) }}</td>
+                                        <td>
+                                            <a href="/download_wb_schedule/{{ m.loan_id }}" class="btn btn-outline-primary btn-sm">Download Weekly Schedule PDF</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted text-center py-3 mb-0">No approved loan applicants in the queue yet. Fill out the form above to add members.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+'''
+
+with open('templates/world_bank_index.html', 'w', encoding='utf-8') as f:
+    f.write(index_html_content)
+
+print("world_bank_index.html created.")

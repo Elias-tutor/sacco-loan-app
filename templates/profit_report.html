@@ -1,0 +1,57 @@
+# Let's also create profit_report.html template so the profit report view works correctly.
+profit_html_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2-Year General Profit & Graphs Report - NMVS SACCO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Nyakadote MVS SACCO - 2-Year Financial Report</h2>
+            <a href="/" class="btn btn-primary">Back to Loan Portfolio</a>
+        </div>
+        <div class="card shadow p-4 mb-4">
+            <h4 class="text-primary">Executive Summary & Profit Analysis</h4>
+            <hr>
+            <p><strong>World Bank Principal:</strong> UGX {{ "{:,.2f}".format(wb_principal) }}</p>
+            <p><strong>World Bank Total Settlement (2 Years @ 5% p.a.):</strong> UGX {{ "{:,.2f}".format(wb_total_repayment) }}</p>
+            <p><strong>Gross Member Revenue (Revolving Cycles + Fees):</strong> UGX {{ "{:,.2f}".format(gross_revenue) }}</p>
+            <p><strong>Net Institutional Profit Retained:</strong> <span class="text-success fw-bold">UGX {{ "{:,.2f}".format(net_profit) }}</span></p>
+            <p><strong>Compulsory Member Savings Reserve:</strong> UGX {{ "{:,.2f}".format(total_savings) }}</p>
+        </div>
+        <div class="card shadow p-4">
+            <h4 class="text-primary">Quarterly Performance Breakdown (Q1 - Q8)</h4>
+            <table class="table table-bordered table-striped text-center mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Quarter</th>
+                        <th>Cycle Interest</th>
+                        <th>Fees Collected</th>
+                        <th>Weekly Savings</th>
+                        <th>Total Quarter Inflow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in quarterly_data %}
+                    <tr>
+                        <td>{{ q.quarter }}</td>
+                        <td>UGX {{ "{:,.2f}".format(q.interest) }}</td>
+                        <td>UGX {{ "{:,.2f}".format(q.fees) }}</td>
+                        <td>UGX {{ "{:,.2f}".format(q.savings) }}</td>
+                        <td class="fw-bold">UGX {{ "{:,.2f}".format(q.total_inflow) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+'''
+
+with open('templates/profit_report.html', 'w', encoding='utf-8') as f:
+    f.write(profit_html_content)
+
+print("profit_report.html created.")
